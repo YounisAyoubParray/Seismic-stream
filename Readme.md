@@ -25,7 +25,7 @@ Focuses on the "rhythm" and surges of global activity over a 10-year span.
 * **[D3.js v7](https://d3js.org/):** Data binding, SVG generation, and animation.
 * **JavaScript (ES6+):** Data processing and logic.
 * **HTML5/CSS3:** Dashboard structure and responsive styling.
-* **KAGGLE Data:** Source for global seismic records.
+* **[KAGGLE Data](https://www.kaggle.com/datasets/gauravkumar2525/global-earthquake-dataset-2015-2025):** Source for global seismic records.
 
 
 ## 📈 Key Insights

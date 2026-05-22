@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Data Visualization Dashboard</title>
+
+
+
+<link rel="stylesheet" href="index.css">
+<script src="d3.v7.min.js"></script>
+</head>
+
+<body>
+
+<h1>Earthquakes Since 2015 Data Visualization Dashboard</h1>
+
+<div class="buttons">
+
+    <button onclick="showChart('grouped')">
+        Grouped Bar
+    </button>
+
+    <button onclick="showChart('stacked')">
+        Stacked Bar
+    </button>
+
+    <button onclick="showChart('area')">
+        Stacked Area
+    </button>
+
+    <button onclick="showChart('stream')">
+        Streamgraph
+    </button>
+
+</div>
+
+
+
+<div id="grouped" class="chart active">
+    <svg id="groupedBar" width="1000" height="550"></svg>
+</div>
+
+<div id="stacked" class="chart">
+    <svg id="stackedBar" width="1000" height="550"></svg>
+</div>
+
+<div id="area" class="chart">
+    <svg id="stackedArea" width="1000" height="550"></svg>
+</div>
+
+<div id="stream" class="chart">
+    <svg id="streamgraph" width="1000" height="550"></svg>
+</div>
+
+
+
+<script src="eq.js"> </script>
+
+</body>
+</html>

@@ -94,10 +94,7 @@ d3.csv("earthquake_dataset.csv").then(function (data) {
   }).sort((a, b) => b.total - a.total).slice(0, 15);
 
   const topCountryNames = topCountries.map(d => d.Country);
-
  
-  // all countries yearly (for per-country views)
-  allCountryNames = Array.from(new Set(data.map(d => d.Country)));
   const countryColors = d3.scaleOrdinal()
     .domain(topCountryNames)
     .range([
@@ -123,13 +120,15 @@ d3.csv("earthquake_dataset.csv").then(function (data) {
 
     ]);
  const baseColors = ["#ff4444", "#00bfff", "#32cd32", "#8a2be2"];
+  allCountryNames = Array.from(new Set(data.map(d => d.Country)));
   yearlyAll = d3.rollups(
     data.filter(d => allCountryNames.includes(d.Country) && d["year"]!== 2025),
     v => v.length,
     d => d.year,
-    d => d.Country
-  ).map(([year, countries]) => {
-    let obj = { year: +year }; countries.forEach(([country, count]) => { obj[country] = count; });
+    d => d.Country)
+    .map(([year, countries]) => {
+    let obj = { year: +year }; 
+    countries.forEach(([country, count]) => { obj[country] = count; });
     allCountryNames.forEach(country => { if (!obj[country]) obj[country] = 0; }); return obj;
   }).sort((a, b) => a.year - b.year);
 
@@ -143,7 +142,12 @@ d3.csv("earthquake_dataset.csv").then(function (data) {
     const x1 = d3.scaleBand().domain(years).range([0, x0.bandwidth()]).padding(0.05);
     const y = d3.scaleLinear().domain([0, d3.max(topCountries, d => Math.max(...recentYears.map(y => d[String(y)] || 0)))]).nice().range([height - margin.bottom, margin.top]);
     const color = d3.scaleOrdinal().domain(years).range(baseColors.slice(0, years.length));
-    svg.append("g").selectAll("g").data(topCountries).join("g").attr("transform", d => `translate(${x0(d.Country)},0)`).selectAll("rect").data(d => recentYears.map(y => ({ key: String(y), value: d[String(y)] }))).join("rect").attr("x", d => x1(d.key)).attr("y", height - margin.bottom).attr("width", x1.bandwidth()).attr("height", 0).attr("fill", d => color(d.key)).transition().duration(1200).ease(d3.easeBounceOut).attr("y", d => y(d.value)).attr("height", d => height - margin.bottom - y(d.value));
+    svg.append("g").selectAll("g").data(topCountries).join("g").attr("transform", d => `translate(${x0(d.Country)},0)`)
+    .selectAll("rect").data(d => recentYears.map(y => ({ key: String(y), value: d[String(y)] })))
+    .join("rect").attr("x", d => x1(d.key)).attr("y", height - margin.bottom)
+    .attr("width", x1.bandwidth()).attr("height", 0)
+    .attr("fill", d => color(d.key)).transition().duration(1200).ease(d3.easeBounceOut)
+    .attr("y", d => y(d.value)).attr("height", d => height - margin.bottom - y(d.value));
     svg.append("g").attr("transform", `translate(0,${height - margin.bottom})`).call(d3.axisBottom(x0)).selectAll("text").attr("transform", "rotate(-45)").style("text-anchor", "end");
     svg.append("g").attr("transform", `translate(${margin.left},0)`).call(d3.axisLeft(y));
     svg.append("text").attr("x", width / 2).attr("y", 30).attr("text-anchor", "middle").attr("fill", "white").style("font-size", "22px").text("Earthquake Count Per Country (recent years)");
@@ -152,14 +156,18 @@ d3.csv("earthquake_dataset.csv").then(function (data) {
 
   function drawStackedBar() {
     const svg = d3.select("#stackedBar");
-    const stackData = topCountries.map(d => { const obj = { country: d.Country }; let total = 0; recentYears.forEach(y => { const val = d[String(y)] || 0; obj['y' + y] = val; total += val; }); obj.total = total; return obj; }).sort((a, b) => b.total - a.total);
-    const keys = recentYears.map(y => 'y' + y);
+    const keys = recentYears.map(String);
+    const stackData = topCountries;
     const stackedSeries = d3.stack().keys(keys)(stackData);
-    const x = d3.scaleBand().domain(stackData.map(d => d.country)).range([margin.left, width - margin.right]).padding(0.2);
+    const x = d3.scaleBand().domain(stackData.map(d => d.Country)).range([margin.left, width - margin.right]).padding(0.2);
     const y = d3.scaleLinear().domain([0, d3.max(stackData, d => keys.reduce((s, k) => s + (d[k] || 0), 0))]).nice().range([height - margin.bottom, margin.top]);
     const colors = d3.scaleOrdinal().domain(keys).range(baseColors);
 
-    svg.append("g").selectAll("g").data(stackedSeries).join("g").attr("fill", d => colors(d.key)).selectAll("rect").data(d => d).join("rect").attr("x", d => x(d.data.country)).attr("y", height - margin.bottom).attr("height", 0).attr("width", x.bandwidth()).transition().duration(1200).ease(d3.easeCubicOut).attr("y", d => y(d[1])).attr("height", d => y(d[0]) - y(d[1]));
+    svg.append("g").selectAll("g").data(stackedSeries).join("g").attr("fill", d => colors(d.key))
+    .selectAll("rect").data(d => d).join("rect")
+    .attr("x", d => x(d.data.Country)).attr("y", height - margin.bottom)
+    .attr("height", 0).attr("width", x.bandwidth()).transition().duration(1200).ease(d3.easeCubicOut)
+    .attr("y", d => y(d[1])).attr("height", d => y(d[0]) - y(d[1]));
 
     svg.append("g").attr("transform", `translate(0,${height - margin.bottom})`).call(d3.axisBottom(x)).selectAll("text").attr("transform", "rotate(-45)").style("text-anchor", "end");
     svg.append("g").attr("transform", `translate(${margin.left},0)`).call(d3.axisLeft(y));
@@ -169,28 +177,33 @@ d3.csv("earthquake_dataset.csv").then(function (data) {
 
   function drawAreaChart() {
     const svg = d3.select("#stackedArea");
-     const keys =
-        topCountries.map(d => d.Country);
+     const keys = topCountries.map(d => d.Country);
     const stacked = d3.stack().keys(keys)(yearlyAll);
-    const x = d3.scaleLinear().domain(d3.extent(yearlyAll, d => d.year)).range([margin.left, width - margin.right]);
-    const y = d3.scaleLinear().domain([0, d3.max(yearlyAll, d => d3.sum(keys, k => d[k]))]).nice().range([height - margin.bottom, margin.top]);
+    const x = d3.scaleLinear().domain(d3.extent(yearlyAll, d => d.year))
+    .range([margin.left, width - margin.right]);
+    const y = d3.scaleLinear().domain([0, d3.max(yearlyAll, d => d3.sum(keys, k => d[k]))]).nice()
+    .range([height - margin.bottom, margin.top]);
     const color = countryColors;
     const area = d3.area().x(d => x(d.data.year)).y0(d => y(d[0])).y1(d => y(d[1]));
-    svg.selectAll("path").data(stacked).join("path").attr("fill", d => color(d.key)).attr("opacity", 0).attr("d", area).transition().duration(1500).attr("opacity", 0.8);
+    svg.selectAll("path").data(stacked).join("path").attr("fill", d => color(d.key))
+    .attr("opacity", 0).attr("d", area).transition().duration(1500).attr("opacity", 0.8);
     addBottomLegend(svg,keys,keys.map(k => countryColors(k)));
-    svg.append("g").attr("transform", `translate(0,${height - margin.bottom})`).call(d3.axisBottom(x).tickFormat(d3.format("d")));
+    svg.append("g").attr("transform", `translate(0,${height - margin.bottom})`)
+    .call(d3.axisBottom(x).tickFormat(d3.format("d")));
     svg.append("g").attr("transform", `translate(${margin.left},0)`).call(d3.axisLeft(y));
-    svg.append("text").attr("x", width / 2).attr("y", 30).attr("text-anchor", "middle").attr("fill", "white").style("font-size", "22px").text("Stacked Area Chart - Earthquake Trends by Country");
+    svg.append("text").attr("x", width / 2)
+    .attr("y", 30).attr("text-anchor", "middle").attr("fill", "white")
+    .style("font-size", "22px").text("Stacked Area Chart - Earthquake Trends by Country");
   }
 
   function drawStreamgraph() {
     const svg = d3.select("#streamgraph");
-     const keys =
-        topCountries.map(d => d.Country);
+    const keys = topCountries.map(d => d.Country);
     const stack = d3.stack().keys(keys).offset(d3.stackOffsetWiggle);
     const layers = stack(yearlyAll);
     const x = d3.scaleLinear().domain(d3.extent(yearlyAll, d => d.year)).range([margin.left, width - margin.right]);
-    const y = d3.scaleLinear().domain([d3.min(layers, layer => d3.min(layer, d => d[0])), d3.max(layers, layer => d3.max(layer, d => d[1]))]).range([height - margin.bottom, margin.top]);
+    const y = d3.scaleLinear().domain([d3.min(layers, layer => d3.min(layer, d => d[0])), d3.max(layers, layer => d3.max(layer, d => d[1]))])
+    .range([height - margin.bottom, margin.top]);
     const color = countryColors;
     const area = d3.area().x(d => x(d.data.year)).y0(d => y(d[0])).y1(d => y(d[1])).curve(d3.curveBasis);
     svg.selectAll("path").data(layers).join("path").attr("d", area).attr("opacity", 0).attr("fill", d => color(d.key)).transition().duration(1500).attr("opacity", 0.8);

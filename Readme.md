@@ -5,15 +5,19 @@ An interactive, web-based dashboard built with **D3.js v7** to explore and analy
 ## 🚀 Overview
 
 This project provides a multi-layered perspective on seismic data:
-* **Deep Dive (2021–2024):** High-resolution comparison of earthquake magnitudes using discrete categorical charts.
+* **Deep Dive (2021–2024):** High-resolution comparison of earthquake counts in top 15 countries.
 * **Long-term Trends (2015–2024):** A decade-long analysis of seismic "flow" using continuous area-based visualizations.
 
 ## 📊 Visualization Modules
 
-### 1. Magnitude Distribution (2021 – 2024)
-Focuses on the breakdown of earthquake intensity in recent years.
-* **Grouped Bar Chart:** Enables direct side-by-side comparison of specific magnitude classes (e.g., comparing "Major" quakes in 2022 vs. 2023).
-* **Stacked Bar Chart:** Illustrates the total annual volume of seismic activity while highlighting the proportion of each magnitude level.
+### 1. Count of Earthquakes in Top 15 Countries (2021 – 2024)
+
+Focuses on comparing the frequency of earthquakes recorded in the top 15 most earthquake-prone countries during recent years.
+
+* **Grouped Bar Chart:** Enables direct side-by-side comparison of earthquake counts among the top 15 countries across different years (e.g., comparing the number of earthquakes in Japan during 2022 vs. 2023).
+
+* **Stacked Bar Chart:** Illustrates the total yearly earthquake activity for the top 15 countries while highlighting each country’s contribution to the overall count.
+
 
 ### 2. Longitudinal Analysis (2015 – 2024)
 Focuses on the "rhythm" and surges of global activity over a 10-year span.
